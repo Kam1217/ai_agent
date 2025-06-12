@@ -1,0 +1,4 @@
+import unittest
+from functions.get_files_info import get_files_info
+
+class TestGetFileInfo(unittest.TestCase):
