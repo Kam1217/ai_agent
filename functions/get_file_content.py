@@ -12,12 +12,12 @@ def get_file_content(working_directory, file_path):
         return f'Error: Cannot read "{file_path}" as it is outsidee the permitted working directory'
     
     try:
-        max_char = 10000
+        max_char = 1000
         
-        with open(file_path, "r") as f:
+        with open(file_directory_path, "r") as f:
             file_content_str = f.read(max_char)
             if f.read(1):
-               file_content_str += f'[...File "{file_path}" truncated at 10000 characters]'
+               file_content_str += f'[...File "{file_path}" truncated at 1000 characters]'
         return file_content_str
 
     except Exception as e:
