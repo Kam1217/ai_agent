@@ -8,7 +8,7 @@ def get_file_content(working_directory, file_path):
         return f'Error: File not found or is not regular file: "{file_directory_path}"'
     
     if not os.path.abspath(file_directory_path).startswith(os.path.abspath(working_directory)):
-        return f'Error: Cannot read "{file_path}" as it is outsidee the permitted working directory'
+        return f'Error: Cannot read "{file_path}" as it is outside the permitted working directory'
     
     try:
         max_char = 1000
