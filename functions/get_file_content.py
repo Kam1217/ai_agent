@@ -2,7 +2,6 @@ import os
 
 def get_file_content(working_directory, file_path):
 
-
     file_directory_path = os.path.abspath(os.path.join(working_directory, file_path))   
 
     if not os.path.isfile(file_directory_path):
