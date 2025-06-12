@@ -23,9 +23,9 @@ class TestGetFileInfo(unittest.TestCase):
 class TestGetFileContent(unittest.TestCase):
    
     def test_truncates_large_file(self):
-        result = get_file_content("calculator", "lorem.txt")
-        self.assertTrue(result.endswith('[...File "lorem.txt" truncated at 1000 characters]'))
-        content_part = result[:-len('[...File "lorem.txt" truncated at 1000 characters]')]
+        result = get_file_content("calculator", "lorem_20K_char.txt")
+        self.assertTrue(result.endswith('[...File "lorem_20K_char.txt" truncated at 1000 characters]'))
+        content_part = result[:-len('[...File "lorem_20K_char.txt" truncated at 1000 characters]')]
         self.assertEqual(len(content_part), 1000)
     
     def test_reads_main_py(self):
