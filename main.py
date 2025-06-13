@@ -3,6 +3,10 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import sys
+from functions.get_file_content import get_file_content
+from functions.get_files_info import get_files_info
+from functions.run_python_file import run_python_file
+from functions.write_file import write_file 
 
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
@@ -20,6 +24,13 @@ When a user asks a question or makes a request, make a function call plan. You c
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
 verbose = "--verbose" in sys.argv
+
+functions ={
+    "get_content": get_file_content,
+    "get_info": get_files_info,
+    "run_python": run_python_file,
+    "write_file" : write_file
+}
 
 if len(sys.argv) == 1:
     print("No prompt provided")
@@ -102,9 +113,14 @@ available_functions = types.Tool(
 messages = [types.Content(role="user", parts=[types.Part(text=prompt)]),]
 response = client.models.generate_content(model='gemini-2.0-flash-001', contents= messages, config= types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt))
 
+if verbose:
+    print(f"User prompt: {prompt}")
+    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+
 def call_function(function_call, verbose=False):
 
-    if function_call.name not in available_functions:
+    if function_call.name not in functions:
         return types.Content(
             role="tool",
             parts=[
@@ -114,9 +130,8 @@ def call_function(function_call, verbose=False):
                 )
             ],
         )    
-    
-    
-    function_name = available_functions[function_call.name]
+  
+    function_name = functions[function_call.name]
     function_call.args["working_directory"] = "./calculator"
     function_result= function_name(**function_call.args)
 
@@ -135,15 +150,18 @@ def call_function(function_call, verbose=False):
         ],
     )    
 
-if verbose:
-    print(f"User prompt: {prompt}")
-    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
-
 if response.function_calls:
     for function_call in response.function_calls:
-        print(f"Calling function: {function_call.name}({function_call.args})")
+        function_call_result = call_function(function_call, verbose)
+
+    try:
+        function_call_result.parts[0].function_response.response
+        if verbose:
+            print(f"-> {function_call_result.parts[0].function_response.response}")
+    except Exception as e:
+        raise Exception(f"function_call_result does not contain the expected structure. Original error: {e}")
 else:
     print(response.text)
+
 
 
