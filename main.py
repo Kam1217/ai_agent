@@ -7,7 +7,6 @@ import sys
 load_dotenv()
 api_key = os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
-
 system_prompt = """
 You are a helpful AI coding agent.
 
@@ -25,7 +24,6 @@ verbose = "--verbose" in sys.argv
 if len(sys.argv) == 1:
     print("No prompt provided")
     sys.exit(1)
-
 if verbose:
     prompt = " ".join(sys.argv[1:-1])
 else:
