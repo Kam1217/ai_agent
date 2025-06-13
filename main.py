@@ -103,12 +103,27 @@ messages = [types.Content(role="user", parts=[types.Part(text=prompt)]),]
 response = client.models.generate_content(model='gemini-2.0-flash-001', contents= messages, config= types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt))
 
 def call_function(function_call, verbose=False):
+
+    if function_call.name not in available_functions:
+        return types.Content(
+            role="tool",
+            parts=[
+                types.Part.from_function_response(
+                    name=function_call.name,
+                    response={"error": f"Unknown function: {function_call.name}"},
+                )
+            ],
+        )    
     
     if verbose:
         print(f"- Calling function: {function_call.name}({function_call.args})")
-    print("f - Calling function: {function_call.name}")
+    print(f"- Calling function: {function_call.name}")
 
-    function_to_call = available_functions[function_call.name]
+    function_name = available_functions[function_call.name]
+    function_call.args["working_directory"] = "./calculator"
+    function_result= function_name(**function_call.args)
+
+
 
 if verbose:
     print(f"User prompt: {prompt}")
